@@ -53,7 +53,6 @@ public class MainController {
 
         loadData();
 
-        // Инициализация данных таблицы
         productsData = FXCollections.observableArrayList(productList.getProducts());
         productsTable.setItems(productsData);
     }
@@ -107,7 +106,7 @@ public class MainController {
             } catch (NullPointerException e) {
                 showAlert("Ошибка ввода", "Выберите значение в поле категории");
             } catch (Exception e) {
-                showAlert("Ошибка ввода" + e.getClass(), e.getMessage());
+                showAlert("Ошибка ввода", e.getMessage());
             }
             return null;
         });
@@ -118,6 +117,64 @@ public class MainController {
                 productsData.setAll(productList.getProducts());
             }
         });
+    }
+
+    @FXML
+    private void handleChangeProduct() {
+        Product selected = productsTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            showAlert("Ошибка изменения", "Выберите продукт для изменения!");
+            return;
+        }
+        // Создание диалогового окна
+        Dialog<Product> dialog = new Dialog<>();
+        dialog.setTitle("Изменить продукт");
+
+        // Кнопки
+        ButtonType addButton = new ButtonType("Изменить", ButtonBar.ButtonData.OK_DONE);
+        ButtonType cancelButton = new ButtonType("Отменить", ButtonBar.ButtonData.CANCEL_CLOSE);
+        dialog.getDialogPane().getButtonTypes().addAll(addButton, cancelButton);
+
+        // Поля ввода
+        TextField nameField = new TextField();
+        nameField.setText(selected.getName());
+        TextField quantityField = new TextField();
+        quantityField.setText(String.valueOf(selected.getQuantity()));
+        ComboBox<Tag> tagComboBox = new ComboBox<>(FXCollections.observableArrayList(tagList.getAllTags()));
+        tagComboBox.setValue(selected.getTag());
+
+        GridPane grid = new GridPane();
+        grid.add(new Label("Название:"), 0, 0);
+        grid.add(nameField, 1, 0);
+        grid.add(new Label("Количество:"), 0, 1);
+        grid.add(quantityField, 1, 1);
+        grid.add(new Label("Категория:"), 0, 2);
+        grid.add(tagComboBox, 1, 2);
+        dialog.getDialogPane().setContent(grid);
+
+        // Обработка результата
+        dialog.setResultConverter(buttonType -> {
+            try {
+                if (buttonType == addButton) {
+                    if (Objects.equals(nameField.getText(), ""))
+                        throw new Exception("Пустая строка в названии товара");
+                    if (Objects.equals(quantityField.getText(), ""))
+                        throw new Exception("Пустая строка в количестве товара");
+                    selected.setName(nameField.getText());
+                    selected.setQuantity(Integer.parseInt(quantityField.getText()));
+                    selected.setTag(tagComboBox.getValue());
+                }
+            } catch (NumberFormatException e) {
+                showAlert("Ошибка ввода", "Введите числовое значение в поле количества");
+            } catch (NullPointerException e) {
+                showAlert("Ошибка ввода", "Выберите значение в поле категории");
+            } catch (Exception e) {
+                showAlert("Ошибка ввода", e.getMessage());
+            }
+            return null;
+        });
+        dialog.showAndWait();
+        productsTable.refresh();
     }
 
     @FXML

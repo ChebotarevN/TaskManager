@@ -10,8 +10,8 @@ public class Product {
     public Product(int id, String name, int quantity, Tag tag) {
         this.id = id;
         this.name = name;
-        setQuantity(quantity);
         this.tag = tag;
+        setQuantity(quantity);
         setStatus();
     }
 
@@ -51,6 +51,7 @@ public class Product {
         } else {
             this.quantity = quantity;
         }
+        setStatus();
     }
 
     public Tag getTag() {
