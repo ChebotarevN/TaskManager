@@ -1,14 +1,14 @@
 package app.listproduct;
 
 import app.dao.impl.ListProductDAO;
-import app.model.ProductList;
+import app.model.*;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import app.model.Product;
 import javafx.scene.layout.GridPane;
 
 public class MainController {
@@ -22,14 +22,21 @@ public class MainController {
     private TableColumn<Product, Integer> colQuantity;
     @FXML
     private TableColumn<Product, String> colTag;
+    @FXML
+    private TableColumn<Product, Status> colStatus;
 
     private ProductList productList;
+    private TagList tagList;
 
     private ObservableList<Product> productsData;
 
     @FXML
     public void initialize() {
-        productList = new ProductList(new ListProductDAO(10).getAllProducts());
+        tagList = new TagList();
+        tagList.addTag(new Tag("Молочное изделие", 30, 60));
+        tagList.addTag(new Tag("Бытовая химия", 30, 60));
+        tagList.addTag(new Tag("Хлебобулочное изделие", 30, 60));
+        productList = new ProductList(new ListProductDAO(10, tagList).getAllProducts());
 
         colId.setCellValueFactory(cellData ->
                 new SimpleIntegerProperty(cellData.getValue().getId()).asObject());
@@ -38,7 +45,9 @@ public class MainController {
         colQuantity.setCellValueFactory(cellData ->
                 new SimpleIntegerProperty(cellData.getValue().getQuantity()).asObject());
         colTag.setCellValueFactory(cellData ->
-                new SimpleStringProperty(cellData.getValue().getTag()));
+                new SimpleStringProperty(cellData.getValue().getTag().getName()));
+        colStatus.setCellValueFactory(cellData ->
+                new SimpleObjectProperty<>(cellData.getValue().getStatus()));
 
         loadData();
 
@@ -48,8 +57,8 @@ public class MainController {
     }
 
     private void loadData() {
-        productList.addProduct(new Product(0, "Молоко", 2, "Молочное изделие"));
-        productList.addProduct(new Product(0, "Мыло", 5, "Бчтовая химия"));
+        productList.addProduct(new Product(0, "Молоко", 2, tagList.getTag("Молочное изделие")));
+        productList.addProduct(new Product(0, "Мыло", 5, tagList.getTag("Бытовая химия")));
     }
 
     @FXML
@@ -66,7 +75,7 @@ public class MainController {
         // Поля ввода
         TextField nameField = new TextField();
         Spinner<Integer> quantitySpinner = new Spinner<>(1, 100, 1);
-        TextField tagField = new TextField();
+        ComboBox<Tag> tagComboBox = new ComboBox<>(FXCollections.observableArrayList(tagList.getAllTags()));
 
         GridPane grid = new GridPane();
         grid.add(new Label("Название:"), 0, 0);
@@ -74,7 +83,7 @@ public class MainController {
         grid.add(new Label("Количество:"), 0, 1);
         grid.add(quantitySpinner, 1, 1);
         grid.add(new Label("Тег:"), 0, 2);
-        grid.add(tagField, 1, 2);
+        grid.add(tagComboBox, 1, 2);
         dialog.getDialogPane().setContent(grid);
 
         // Обработка результата
@@ -84,7 +93,7 @@ public class MainController {
                         0,
                         nameField.getText(),
                         quantitySpinner.getValue(),
-                        tagField.getText()
+                        tagComboBox.getValue()
                 );
             }
             return null;
@@ -92,7 +101,7 @@ public class MainController {
 
         // Добавление продукта
         dialog.showAndWait().ifPresent(product -> {
-            if (product.getName() != null && product.getTag() != null) {
+            if ((product.getName() != null && !product.getName().isEmpty()) && product.getTag() != null) {
                 productList.addProduct(product);
                 productsData.setAll(productList.getProducts());
             }

@@ -8,8 +8,19 @@ public class TagList {
     private List<Tag> tags = new ArrayList<>();
 
     public void addTag(Tag tag){
-        if (tags.stream().noneMatch(t -> Objects.equals(t.getTag(), tag.getTag()))){
+        if (tags.stream().noneMatch(t -> Objects.equals(t.getName(), tag.getName()))){
             tags.add(tag);
         }
+    }
+
+    public List<Tag> getAllTags() {
+        return tags;
+    }
+
+    public Tag getTag(String name) {
+        return tags.stream()
+                .filter(t -> Objects.equals(t.getName(), name))
+                .findFirst()
+                .orElse(null);
     }
 }

@@ -4,18 +4,21 @@ public class Product {
     private int id;
     private String name;
     private int quantity;
-    private String tag;
+    private Tag tag;
     private Status status;
 
-    public Product(int id, String name, int quantity, String tag) {
+    public Product(int id, String name, int quantity, Tag tag) {
         this.id = id;
         this.name = name;
         this.quantity = quantity;
         this.tag = tag;
+        setStatus();
     }
 
     private void setStatus() {
-        
+        if (quantity < tag.getBound1()) status = Status.LOW;
+        else if (quantity < tag.getBound2()) status = Status.NORMAL;
+        else status = Status.HIGH;
     }
 
     public Status getStatus() {
@@ -46,11 +49,11 @@ public class Product {
         this.quantity = quantity;
     }
 
-    public String getTag() {
+    public Tag getTag() {
         return tag;
     }
 
-    public void setTag(String tag) {
+    public void setTag(Tag tag) {
         this.tag = tag;
     }
 }

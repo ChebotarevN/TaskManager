@@ -2,6 +2,7 @@ package app.dao.impl;
 
 import app.dao.ProductDAO;
 import app.model.Product;
+import app.model.TagList;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +12,7 @@ public class ListProductDAO implements ProductDAO {
 
     private List<Product> products;
 
-    public ListProductDAO(int size) {
+    public ListProductDAO(int size, TagList tagList) {
         products = new ArrayList<>();
         Random random = new Random();
         for (int i = 0; i < size; i++) {
@@ -19,7 +20,7 @@ public class ListProductDAO implements ProductDAO {
                     0,
                     "Хлеб",
                     random.nextInt(100),
-                    "Хлебобулочное изделие"
+                    tagList.getTag("Хлебобулочное изделие")
             );
             products.add(product);
         }

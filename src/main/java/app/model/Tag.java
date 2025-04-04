@@ -1,19 +1,26 @@
 package app.model;
 
 public class Tag {
-    private String tag;
+    private String name;
     private int bound1, bound2;
 
-    public Tag(String tag, int bound1, int bound2) {
-
+    public Tag(String name, int bound1, int bound2) {
+        this.name = name;
+        this.bound1 = bound1;
+        this.bound2 = bound2;
     }
 
-    public String getTag() {
-        return tag;
+    @Override
+    public String toString() {
+        return name;
     }
 
-    public void setTag(String tag) {
-        this.tag = tag;
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String tag) {
+        this.name = name;
     }
 
     public int getBound1() {
