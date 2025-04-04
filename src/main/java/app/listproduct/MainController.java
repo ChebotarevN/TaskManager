@@ -11,6 +11,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 
+import java.util.Objects;
+
 public class MainController {
     @FXML
     private TableView<Product> productsTable;
@@ -68,37 +70,47 @@ public class MainController {
         dialog.setTitle("Добавить продукт");
 
         // Кнопки
-        ButtonType addButton = new ButtonType("Добавить", ButtonBar.ButtonData.OK_DONE);
+        ButtonType addButton = new ButtonType("Добавить продукт", ButtonBar.ButtonData.OK_DONE);
         ButtonType cancelButton = new ButtonType("Отменить", ButtonBar.ButtonData.CANCEL_CLOSE);
         dialog.getDialogPane().getButtonTypes().addAll(addButton, cancelButton);
 
         // Поля ввода
         TextField nameField = new TextField();
-        Spinner<Integer> quantitySpinner = new Spinner<>(1, 100, 1);
+        TextField quantityField = new TextField();
         ComboBox<Tag> tagComboBox = new ComboBox<>(FXCollections.observableArrayList(tagList.getAllTags()));
 
         GridPane grid = new GridPane();
         grid.add(new Label("Название:"), 0, 0);
         grid.add(nameField, 1, 0);
         grid.add(new Label("Количество:"), 0, 1);
-        grid.add(quantitySpinner, 1, 1);
-        grid.add(new Label("Тег:"), 0, 2);
+        grid.add(quantityField, 1, 1);
+        grid.add(new Label("Категория:"), 0, 2);
         grid.add(tagComboBox, 1, 2);
         dialog.getDialogPane().setContent(grid);
 
         // Обработка результата
         dialog.setResultConverter(buttonType -> {
-            if (buttonType == addButton) {
-                return new Product(
-                        0,
-                        nameField.getText(),
-                        quantitySpinner.getValue(),
-                        tagComboBox.getValue()
-                );
+            try {
+                if (buttonType == addButton) {
+                    if (Objects.equals(nameField.getText(), "")) throw new Exception("Пустая строка в названии товара");
+                    if (Objects.equals(quantityField.getText(), ""))
+                        throw new Exception("Пустая строка в количестве товара");
+                    return new Product(
+                            0,
+                            nameField.getText(),
+                            Integer.parseInt(quantityField.getText()),
+                            tagComboBox.getValue()
+                    );
+                }
+            } catch (NumberFormatException e) {
+                showAlert("Ошибка ввода", "Введите числовое значение в поле количества");
+            } catch (NullPointerException e) {
+                showAlert("Ошибка ввода", "Выберите значение в поле категории");
+            } catch (Exception e) {
+                showAlert("Ошибка ввода" + e.getClass(), e.getMessage());
             }
             return null;
         });
-
         // Добавление продукта
         dialog.showAndWait().ifPresent(product -> {
             if ((product.getName() != null && !product.getName().isEmpty()) && product.getTag() != null) {

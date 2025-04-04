@@ -10,7 +10,7 @@ public class Product {
     public Product(int id, String name, int quantity, Tag tag) {
         this.id = id;
         this.name = name;
-        this.quantity = quantity;
+        setQuantity(quantity);
         this.tag = tag;
         setStatus();
     }
@@ -46,7 +46,11 @@ public class Product {
     }
 
     public void setQuantity(int quantity) {
-        this.quantity = quantity;
+        if (quantity < 0) {
+            this.quantity = 0;
+        } else {
+            this.quantity = quantity;
+        }
     }
 
     public Tag getTag() {
