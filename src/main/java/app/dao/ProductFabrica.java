@@ -1,9 +1,9 @@
 package app.dao;
 
+import app.dao.impl.DBProductDAO;
 import app.dao.impl.FileProductDAO;
 import app.dao.impl.ListProductDAO;
 import app.listproduct.MainController;
-import app.model.ProductList;
 import app.model.TagList;
 
 import java.io.FileNotFoundException;
@@ -15,7 +15,7 @@ public class ProductFabrica {
 
     public static ProductDAO createDAO(String type, TagList tagList) throws FileNotFoundException {
         if (type.equalsIgnoreCase(BD)) {
-//            return new DbDAO();
+            return new DBProductDAO(tagList);
         } else if (type.equalsIgnoreCase(FILE)) {
             return new FileProductDAO(MainController.selectFile(), tagList);//имя файла
         } else if (type.equalsIgnoreCase(RAM)) {
@@ -23,6 +23,5 @@ public class ProductFabrica {
         } else {
             throw new IllegalArgumentException("Invalid datasource type!");
         }
-        return null;
     }
 }

@@ -2,7 +2,7 @@ package app.model;
 
 public enum StatusEnum {
     LOW("Недостаток"),
-    NORMAL("Достаточно"),
+    NORMAL("Достаток"),
     HIGH("Избыток");
 
     private String text;

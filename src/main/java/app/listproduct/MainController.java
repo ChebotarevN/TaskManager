@@ -54,7 +54,7 @@ public class MainController {
                 new SimpleObjectProperty<>(cellData.getValue().getStatus()));
         workMode.setItems(FXCollections.observableArrayList(ProductFabrica.BD, ProductFabrica.FILE, ProductFabrica.RAM));
         workMode.getSelectionModel().selectedIndexProperty().addListener(
-                (_, _, t) -> {
+                (_, _, _) -> {
                     try {
                         changeWorkMode();
                     } catch (FileNotFoundException e) {
