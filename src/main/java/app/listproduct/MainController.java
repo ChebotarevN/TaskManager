@@ -1,5 +1,6 @@
 package app.listproduct;
 
+import app.dao.ProductDAO;
 import app.dao.impl.ListProductDAO;
 import app.model.*;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -11,6 +12,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class MainController {
@@ -25,21 +28,17 @@ public class MainController {
     @FXML
     private TableColumn<Product, String> colTag;
     @FXML
-    private TableColumn<Product, Status> colStatus;
+    private TableColumn<Product, StatusEnum> colStatus;
 
-    private ProductList productList;
+    private ProductDAO productList;
     private TagList tagList;
 
     private ObservableList<Product> productsData;
 
     @FXML
     public void initialize() {
-        tagList = new TagList();
-        tagList.addTag(new Tag("Молочное изделие", 30, 60));
-        tagList.addTag(new Tag("Бытовая химия", 30, 60));
-        tagList.addTag(new Tag("Хлебобулочное изделие", 30, 60));
-        productList = new ProductList(new ListProductDAO(10, tagList).getAllProducts());
-
+        loadData();
+        productList = new ListProductDAO(10, tagList);
         colId.setCellValueFactory(cellData ->
                 new SimpleIntegerProperty(cellData.getValue().getId()).asObject());
         colName.setCellValueFactory(cellData ->
@@ -53,13 +52,18 @@ public class MainController {
 
         loadData();
 
-        productsData = FXCollections.observableArrayList(productList.getProducts());
+        productsData = FXCollections.observableArrayList(productList.getAllProducts());
         productsTable.setItems(productsData);
     }
 
     private void loadData() {
-        productList.addProduct(new Product(0, "Молоко", 2, tagList.getTag("Молочное изделие")));
-        productList.addProduct(new Product(0, "Мыло", 5, tagList.getTag("Бытовая химия")));
+        tagList = new TagList();
+        List<String> items = List.of("Молоко", "Сыр", "Творог", "Йогурт", "Масло");
+        tagList.addTag(new Tag("Молочное изделие", 30, 60, items));
+        items = List.of("Свинина", "Говядина", "Курица", "Рыба", "Колбаса");
+        tagList.addTag(new Tag("Мясо и мясные продукты", 30, 60, items));
+        items = List.of("Хлеб", "Булочки", "Багеты", "Тосты", "Печенье");
+        tagList.addTag(new Tag("Хлебобулочное изделие", 30, 60, items));
     }
 
     @FXML
@@ -75,10 +79,15 @@ public class MainController {
 
         // Поля ввода
         TextField nameField = new TextField();
+        nameField.setPromptText("Введите название товара");
         TextField quantityField = new TextField();
+        quantityField.setPromptText("Введите количество товара");
         ComboBox<Tag> tagComboBox = new ComboBox<>(FXCollections.observableArrayList(tagList.getAllTags()));
+        tagComboBox.setPromptText("Выберите категорию товара");
 
         GridPane grid = new GridPane();
+        grid.setHgap(5);
+        grid.setVgap(10);
         grid.add(new Label("Название:"), 0, 0);
         grid.add(nameField, 1, 0);
         grid.add(new Label("Количество:"), 0, 1);
@@ -114,7 +123,7 @@ public class MainController {
         dialog.showAndWait().ifPresent(product -> {
             if ((product.getName() != null && !product.getName().isEmpty()) && product.getTag() != null) {
                 productList.addProduct(product);
-                productsData.setAll(productList.getProducts());
+                productsData.setAll(productList.getAllProducts());
             }
         });
     }
@@ -160,9 +169,11 @@ public class MainController {
                         throw new Exception("Пустая строка в названии товара");
                     if (Objects.equals(quantityField.getText(), ""))
                         throw new Exception("Пустая строка в количестве товара");
-                    selected.setName(nameField.getText());
-                    selected.setQuantity(Integer.parseInt(quantityField.getText()));
-                    selected.setTag(tagComboBox.getValue());
+                    Product change = new Product(selected.getId(),nameField.getText(),
+                            Integer.parseInt(quantityField.getText()),
+                            tagComboBox.getValue());
+                    productList.updateProduct(change);
+                    productsData.setAll(productList.getAllProducts());
                 }
             } catch (NumberFormatException e) {
                 showAlert("Ошибка ввода", "Введите числовое значение в поле количества");
@@ -181,7 +192,7 @@ public class MainController {
     private void handleDeleteProduct() {
         Product selected = productsTable.getSelectionModel().getSelectedItem();
         if (selected != null) {
-            productList.removeProduct(selected.getId());
+            productList.deleteProduct(selected.getId());
             productsData.remove(selected);
         } else {
             showAlert("Ошибка удаления", "Выберите продукт для удаления!");

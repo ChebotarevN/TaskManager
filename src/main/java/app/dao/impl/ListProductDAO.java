@@ -10,17 +10,21 @@ import java.util.Random;
 
 public class ListProductDAO implements ProductDAO {
 
-    private List<Product> products;
+    private final List<Product> products;
 
     public ListProductDAO(int size, TagList tagList) {
         products = new ArrayList<>();
         Random random = new Random();
-        for (int i = 0; i < size; i++) {
+        int id = 1;
+        if (!products.isEmpty()) id = products.getLast().getId() + 1;
+        for (int i = id; i < size + id; i++) {
+            int randomTag = random.nextInt(0, tagList.getSize());
+            int randomItem = random.nextInt(0, tagList.getItems(randomTag).size());
             Product product = new Product(
-                    0,
-                    "Хлеб",
+                    i,
+                    tagList.getTag(randomTag).getItems().get(randomItem),
                     random.nextInt(100),
-                    tagList.getTag("Хлебобулочное изделие")
+                    tagList.getTag(randomTag)
             );
             products.add(product);
         }
@@ -41,6 +45,7 @@ public class ListProductDAO implements ProductDAO {
     }
 
     public void addProduct(Product product) {
+        product.setId(products.getLast().getId() + 1);
         products.add(product);
     }
 

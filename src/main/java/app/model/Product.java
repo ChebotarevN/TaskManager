@@ -5,7 +5,7 @@ public class Product {
     private String name;
     private int quantity;
     private Tag tag;
-    private Status status;
+    private StatusEnum status;
 
     public Product(int id, String name, int quantity, Tag tag) {
         this.id = id;
@@ -15,13 +15,20 @@ public class Product {
         setStatus();
     }
 
-    private void setStatus() {
-        if (quantity < tag.getBound1()) status = Status.LOW;
-        else if (quantity < tag.getBound2()) status = Status.NORMAL;
-        else status = Status.HIGH;
+    public Product(String name, int quantity, Tag tag) {
+        this.name = name;
+        this.tag = tag;
+        setQuantity(quantity);
+        setStatus();
     }
 
-    public Status getStatus() {
+    private void setStatus() {
+        if (quantity < tag.getBound1()) status = StatusEnum.LOW;
+        else if (quantity < tag.getBound2()) status = StatusEnum.NORMAL;
+        else status = StatusEnum.HIGH;
+    }
+
+    public StatusEnum getStatus() {
         return status;
     }
 

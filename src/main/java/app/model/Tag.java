@@ -1,13 +1,18 @@
 package app.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class Tag {
     private String name;
     private int bound1, bound2;
+    private List<String> items = new ArrayList<>();
 
-    public Tag(String name, int bound1, int bound2) {
+    public Tag(String name, int bound1, int bound2, List<String> items) {
         this.name = name;
         this.bound1 = bound1;
         this.bound2 = bound2;
+        this.items = items;
     }
 
     @Override
@@ -17,10 +22,6 @@ public class Tag {
 
     public String getName() {
         return name;
-    }
-
-    public void setName(String tag) {
-        this.name = name;
     }
 
     public int getBound1() {
@@ -37,5 +38,9 @@ public class Tag {
 
     public void setBound2(int bound2) {
         this.bound2 = bound2;
+    }
+
+    public List<String> getItems() {
+        return items;
     }
 }
