@@ -23,7 +23,7 @@ public class ListProductDAO implements ProductDAO {
             Product product = new Product(
                     i,
                     tagList.getTag(randomTag).getItems().get(randomItem),
-                    random.nextInt(100),
+                    random.nextInt(1, 70),
                     tagList.getTag(randomTag)
             );
             products.add(product);

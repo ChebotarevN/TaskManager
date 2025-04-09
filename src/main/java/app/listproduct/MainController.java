@@ -1,7 +1,7 @@
 package app.listproduct;
 
 import app.dao.ProductDAO;
-import app.dao.impl.ListProductDAO;
+import app.dao.ProductFabrica;
 import app.model.*;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -11,8 +11,10 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
+import javafx.stage.FileChooser;
 
-import java.util.ArrayList;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.List;
 import java.util.Objects;
 
@@ -29,6 +31,8 @@ public class MainController {
     private TableColumn<Product, String> colTag;
     @FXML
     private TableColumn<Product, StatusEnum> colStatus;
+    @FXML
+    private ComboBox<String> workMode;
 
     private ProductDAO productList;
     private TagList tagList;
@@ -38,7 +42,6 @@ public class MainController {
     @FXML
     public void initialize() {
         loadData();
-        productList = new ListProductDAO(10, tagList);
         colId.setCellValueFactory(cellData ->
                 new SimpleIntegerProperty(cellData.getValue().getId()).asObject());
         colName.setCellValueFactory(cellData ->
@@ -49,9 +52,20 @@ public class MainController {
                 new SimpleStringProperty(cellData.getValue().getTag().getName()));
         colStatus.setCellValueFactory(cellData ->
                 new SimpleObjectProperty<>(cellData.getValue().getStatus()));
+        workMode.setItems(FXCollections.observableArrayList(ProductFabrica.BD, ProductFabrica.FILE, ProductFabrica.RAM));
+        workMode.getSelectionModel().selectedIndexProperty().addListener(
+                (_, _, t) -> {
+                    try {
+                        changeWorkMode();
+                    } catch (FileNotFoundException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+    }
 
-        loadData();
-
+    public void changeWorkMode() throws FileNotFoundException {
+        productList = ProductFabrica.createDAO(workMode.getValue(), tagList);
+        assert productList != null;
         productsData = FXCollections.observableArrayList(productList.getAllProducts());
         productsTable.setItems(productsData);
     }
@@ -59,9 +73,9 @@ public class MainController {
     private void loadData() {
         tagList = new TagList();
         List<String> items = List.of("Молоко", "Сыр", "Творог", "Йогурт", "Масло");
-        tagList.addTag(new Tag("Молочное изделие", 30, 60, items));
+        tagList.addTag(new Tag("Молочное изделие", 20, 40, items));
         items = List.of("Свинина", "Говядина", "Курица", "Рыба", "Колбаса");
-        tagList.addTag(new Tag("Мясо и мясные продукты", 30, 60, items));
+        tagList.addTag(new Tag("Мясо и мясные продукты", 10, 30, items));
         items = List.of("Хлеб", "Булочки", "Багеты", "Тосты", "Печенье");
         tagList.addTag(new Tag("Хлебобулочное изделие", 30, 60, items));
     }
@@ -169,7 +183,7 @@ public class MainController {
                         throw new Exception("Пустая строка в названии товара");
                     if (Objects.equals(quantityField.getText(), ""))
                         throw new Exception("Пустая строка в количестве товара");
-                    Product change = new Product(selected.getId(),nameField.getText(),
+                    Product change = new Product(selected.getId(), nameField.getText(),
                             Integer.parseInt(quantityField.getText()),
                             tagComboBox.getValue());
                     productList.updateProduct(change);
@@ -205,5 +219,11 @@ public class MainController {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    public static File selectFile() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setSelectedExtensionFilter(new FileChooser.ExtensionFilter("Текстовый файл", ".txt"));
+        return fileChooser.showOpenDialog(null);
     }
 }
