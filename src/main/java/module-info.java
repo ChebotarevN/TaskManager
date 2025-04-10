@@ -1,4 +1,4 @@
-module app.listproduct {
+module app.tasklist {
     requires javafx.controls;
     requires javafx.fxml;
     requires java.sql;

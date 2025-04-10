@@ -69,7 +69,7 @@ public class MainController {
     }
 
     @FXML
-    private void handleAddProduct() {
+    private void handleAddTask() {
         // Создание диалогового окна
         Dialog<Task> dialog = new Dialog<>();
         dialog.setTitle("Добавить задачу");
@@ -136,7 +136,7 @@ public class MainController {
     }
 
     @FXML
-    private void handleChangeProduct() {
+    private void handleChangeTask() {
         Task selected = taskTable.getSelectionModel().getSelectedItem();
         if (selected == null) {
             showAlert("Ошибка изменения", "Выберите продукт для изменения!");
@@ -211,7 +211,7 @@ public class MainController {
     }
 
     @FXML
-    private void handleDeleteProduct() {
+    private void handleDeleteTask() {
         Task selected = taskTable.getSelectionModel().getSelectedItem();
         if (selected != null) {
             taskList.deleteTask(selected.getId());
