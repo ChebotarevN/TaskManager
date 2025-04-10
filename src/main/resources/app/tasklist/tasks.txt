@@ -1,0 +1,4 @@
+1,Task 1,Context for task 1,8:09,К исполнению
+2,Task 2,Context for task 2,9:11,В процессе
+4,Task 4,Context for task 4,23:11,Закрыта
+5,Task 5,Context for task 5,23:33,Выполнена

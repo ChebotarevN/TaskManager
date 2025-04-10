@@ -5,6 +5,6 @@ module app.listproduct {
     requires dotenv;
 
 
-    opens app.listproduct to javafx.fxml;
-    exports app.listproduct;
+    opens app.tasklist to javafx.fxml;
+    exports app.tasklist;
 }

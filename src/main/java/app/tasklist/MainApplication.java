@@ -1,4 +1,4 @@
-package app.listproduct;
+package app.tasklist;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -9,7 +9,7 @@ public class MainApplication extends javafx.application.Application {
     public void start(Stage stage) throws Exception {
         FXMLLoader fxmlLoader = new FXMLLoader(MainApplication.class.getResource("main-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 600, 400);
-        stage.setTitle("Список покупок");
+        stage.setTitle("Список задач");
         stage.setScene(scene);
         stage.show();
     }
